@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GreekGods</title>
+    <!-- 
+        2020-02-16 This file was created for practice
+     -->
+
+    <style>
+      .centered {
+        text-align: center;
+        margin: 64px auto 32px;
+        font-family: monospace;
+      }
+
+      #area_for_buttons {
+        width: 660px;
+        text-align: center;
+        margin: 16px auto;
+      }
+
+      button {
+        margin: 4px;
+        background-color: lavender;
+      }
+    </style>
+
+    <script>
+      class Gods {
+        constructor(given_gods_name, given_gods_realms) {
+          this.gods_name = given_gods_name;
+          this.gods_realm = given_gods_realms;
+        }
+
+        get_name() {
+          return this.gods_name;
+        }
+
+        get_realm() {
+          return this.gods_realm;
+        }
+      }
+
+      // initialized array that contains references to Greek Gods objects
+
+      var gods_list = [
+        new Gods('Aeolus', 'Greek god of the winds and air'),
+        new Gods(
+          'Aether',
+          'Primordial god of the upper air, light, the atmosphere, space and heaven'
+        ),
+        new Gods('Alastor', 'God of family feuds and avenger of evil deeds.'),
+        new Gods(
+          'Apollo',
+          'Olympian god of music, poetry, art, oracles, archery, plague, medicine, sun, light and knowledge.'
+        ),
+        new Gods(
+          'Ares',
+          'God of war. Represented the physical, violent and untamed aspect of war.'
+        ),
+        new Gods(
+          'Atlas',
+          'The Primordial Titan of Astronomy. Condemned by Zeus to carry the world on his back after the Titans lost the war.'
+        ),
+        new Gods(
+          'Cronos',
+          'The god of time. Not to be confused with Cronus, the Titan father of Zeus.'
+        ),
+        new Gods(
+          'Deimos',
+          'Deimos is the personification of dread and terror.'
+        ),
+        new Gods(
+          'Dionysus',
+          'An Olympian god of the grape harvest, winemaking and wine, of ritual madness, religious ecstasy and theatre.'
+        ),
+        new Gods(
+          'Eros',
+          'God of sexual desire, attraction, love and procreation.'
+        )
+      ];
+
+      var last_clicked_button = null;
+
+      function god_selected(pressed_button) {
+        var selected_gods_name = String(pressed_button.textContent);
+        var selected_god = null;
+        var gods_index = 0;
+
+        while (selected_god == null) {
+          if (gods_list[gods_index].get_name() == selected_gods_name) {
+            selected_god = gods_list[gods_index];
+          }
+          gods_index++;
+        }
+
+        document.getElementById('god_name_text').innerHTML =
+          'Greek God ' + selected_god.get_name();
+        document.getElementById(
+          'realms_and_influences'
+        ).innerHTML = selected_god.get_realm();
+
+        if (last_clicked_button != null) {
+          last_clicked_button.style.background = 'lavender';
+        }
+        last_clicked_button = pressed_button;
+        last_clicked_button.style.background = 'lightgreen';
+      }
+    </script>
+  </head>
+  <body>
+    <div class="centered">
+      <h1 id="god_name_text">Greek Gods Data Finder</h1>
+
+      <h1 id="realms_and_influences">Press a button!</h1>
+    </div>
+
+    <div id="area_for_buttons">
+      <script>
+        var number_of_buttons_on_current_line = 0;
+
+        for (var gods_index in gods_list) {
+          var gods_name = gods_list[gods_index].get_name();
+
+          document.write(
+            // '<button onclick="god_selected( this )">' + gods_name + '</button>'
+            '<button onclick="god_selected( this )">' + gods_name + '</button>'
+          );
+
+          number_of_buttons_on_current_line++;
+
+          if (number_of_buttons_on_current_line >= 5) {
+            document.write('<br>&nbsp;');
+            number_of_buttons_on_current_line = 0;
+          }
+        }
+      </script>
+    </div>
+  </body>
+</html>
