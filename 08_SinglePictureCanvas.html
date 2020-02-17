@@ -20,9 +20,64 @@
     <title>SHOWING A PICTURE IN DIFFERENT SIZES"</title>
 
     <script type="text/javascript">
-      var picture_to_show = new Image();
+      // array of pictures
+      var picture_file_names = [
+        './images/yellow_field_by_vincent_van_gogh.jpg',
+        './images/persistence_of_memory_by_dali.jpg',
+        './images/night_watch_by_rembrandt.jpg',
+        './images/demoiselles_de_avignon_by_picasso.jpg',
+        './images/gauguin_two_women_on_the_beach_1891.jpg'
+      ];
+      // set new var for array
+      var pictures_to_be_shown = new Array();
+      // loop through each pic in array
+      for (var picture_index in picture_file_names) {
+        // set new image to pic shown
+        var picture_to_show = new Image();
+        // src = index of pic shown on screen
+        picture_to_show.src = picture_file_names[picture_index];
+        // push the picture into new array
+        pictures_to_be_shown.push(picture_to_show);
+      }
+      var index_of_current_picture = 0;
+      var picture_enlargement = 1.0;
+      var code_of_last_pressd_key;
 
-      picture_to_show.src = './images/yellow_field_by_vincent_van_gogh.jpg';
+      function on_key_up(event) {
+        key_code = event.which;
+        console.log(key_code);
+
+        // up arrow
+        if (key_code == 38) {
+          picture_enlargement = picture_enlargement + 0.1;
+          // down arrow
+        } else if (key_code == 40) {
+          picture_enlargement = picture_enlargement - 0.1;
+          // right arrow
+        } else if (key_code == 39) {
+          // go tho next pic
+          index_of_current_picture++;
+          if (index_of_current_picture >= pictures_to_be_shown.length) {
+            index_of_current_picture = 0;
+          }
+
+          picture_to_show = pictures_to_be_shown[index_of_current_picture];
+          // left arrow
+        } else if (key_code == 37) {
+          // go back
+          index_of_current_picture--;
+          if (index_of_current_picture < 0) {
+            index_of_current_picture = pictures_to_be_shown.length - 1;
+          }
+
+          picture_to_show = pictures_to_be_shown[index_of_current_picture];
+        }
+        draw_on_canvas();
+      }
+
+      // var picture_to_show = new Image();
+
+      // picture_to_show.src = './images/yellow_field_by_vincent_van_gogh.jpg';
 
       function draw_on_canvas() {
         var canvas = document.getElementById('picture_canvas');
@@ -30,66 +85,76 @@
 
         // We'll fill the entire canvas with light color, which overdraws
         // the previous drawings.
-
         context.fillStyle = 'rgb( 255, 255, 210 )'; // light yellow
 
         context.fillRect(0, 0, canvas.width, canvas.height);
 
+        // context.fillStyle = 'FireBrick'; // brick color
+        context.fillStyle = 'Orange'; // background color is the mortar color
+
+        var brick_position_x = 0; // first brick will be drawn to the
+        var brick_position_y = 0; // upper left corner of the canvas
+        var brick_height = 28;
+        var brick_length = 112;
+        var gap_between_bricks = 4; // this is the thickness of mortar
+        var row_counter = 0;
+
+        while (brick_position_y < canvas.height) {
+          // The following while loop draws a row of bricks.
+
+          while (brick_position_x < canvas.width) {
+            context.fillRect(
+              brick_position_x,
+              brick_position_y,
+              brick_length,
+              brick_height
+            ); // this draws a brick
+            brick_position_x =
+              brick_position_x + brick_length + gap_between_bricks;
+          }
+
+          // Now we must prepare to do the next row of bricks.
+          // Every second row must start with a half brick.
+          row_counter++;
+
+          if (row_counter % 2 == 1) {
+            // Is this an odd row of bricks?
+            brick_position_x = -brick_length / 2;
+          } else {
+            brick_position_x = 0;
+          }
+
+          brick_position_y =
+            brick_position_y + brick_height + gap_between_bricks;
+        }
+
         var picture_width = picture_to_show.width;
         var picture_height = picture_to_show.height;
-        var center_width = canvas.width / 2 - picture_width / 2;
-        var center_height = canvas.height / 2 - picture_height / 2;
+        var picture_position_x = canvas.width / 2 - picture_width / 2;
+        var picture_position_y = canvas.height / 2 - picture_height / 2;
+        var desired_picture_width = picture_enlargement * picture_width;
+        var desired_picture_height = picture_enlargement * picture_height;
+        var picture_position_x = canvas.width / 2 - desired_picture_width / 2;
+        var picture_position_y = canvas.height / 2 - desired_picture_height / 2;
 
-        var picture_position_x = center_width;
-        var picture_position_y = center_height;
+        var picture_frame = 20;
 
         context.fillStyle = 'rgb( 0, 0, 0 )'; // black
         context.fillRect(
-          picture_position_x - 20,
-          picture_position_y - 20,
-          picture_width + 40,
-          picture_height + 40
+          picture_position_x - picture_frame,
+          picture_position_y - picture_frame,
+          desired_picture_width + picture_frame * 2,
+          desired_picture_height + picture_frame * 2
         );
         //  The following statement shows the picture in its natural size.
 
         context.drawImage(
           picture_to_show,
           picture_position_x,
-          picture_position_y
+          picture_position_y,
+          desired_picture_width,
+          desired_picture_height
         );
-
-        // picture_position_x = picture_position_x + picture_width + 20;
-
-        //  Next we'll show a smaller version of the picture.
-
-        // context.drawImage(
-        //   picture_to_show,
-        //   picture_position_x,
-        //   picture_position_y,
-        //   picture_width / 2,
-        //   picture_height / 2
-        // );
-
-        // picture_position_y = picture_position_y + picture_height / 2 + 20;
-
-        //  The last statement shows the right half of the picture so that
-        //  it is positioned below the previously drawn picture.
-        //  You can think that the parameters below first specify an image,
-        //  then they specify a rectangle within the image, and then they
-        //  specify a rectangle on the canvas. Image data is copied from the
-        //  rectangle inside the image to the rectangle on the canvas.
-
-        // context.drawImage(
-        //   picture_to_show,
-        //   picture_width / 2,
-        //   0, // coordinates inside the picture
-        //   picture_width / 2,
-        //   picture_height,
-        //   picture_position_x,
-        //   picture_position_y,
-        //   picture_width / 2,
-        //   picture_height
-        // );
       }
     </script>
     <!-- End of JavaScript code. -->
@@ -106,7 +171,7 @@
     <!-- End of CSS style definitions. -->
   </head>
 
-  <body onload="draw_on_canvas()">
+  <body onload="draw_on_canvas()" onkeyup="on_key_up(event)">
     <div id="centered">
       <canvas id="picture_canvas" width="960" height="744"> </canvas>
     </div>
