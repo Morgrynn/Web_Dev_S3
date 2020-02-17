@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="ISO-8859-1" />
+    <title>ClickingsCanvas.html &copy; Kari Laitinen</title>
+    <!-- ClickingsCanvas.html (c) Copyright Kari Laitinen
+
+   2012-02-26 This page was created.
+   2016-03-23 Last modification.
+
+   This program shows how to:
+      - react to the event when a mouse button is pressed down
+      - define array objects and add new elements to the
+        end of arrays
+
+
+   See notes at the end of this file.
+-->
+
+    <script type="text/javascript">
+      // We make here two arrays for storing the coordinates of
+      // the clicked points. In the beginning the arrays are empty.
+
+      var x_coordinates_of_clickings = new Array();
+      var y_coordinates_of_clickings = new Array();
+
+      var text_to_show = 'Click!';
+      var large_font = 'bold 24px serif';
+      // Gloabal variables
+      var clicked_point_x = -1;
+      var clicked_point_y = -1;
+
+      var mouse_button_is_down = false;
+
+      function on_mouse_down(event) {
+        // The following variables will store the cursor
+        // coordinates relative to the upper left corner of the canvas.
+
+        clicked_point_x = event.offsetX;
+        clicked_point_y = event.offsetY;
+
+        // With the push() method we add new elements to the end
+        // of the two arrays.
+
+        x_coordinates_of_clickings.push(clicked_point_x);
+        y_coordinates_of_clickings.push(clicked_point_y);
+        // console.log("x_coordinates_of_clickings ", x_coordinates_of_clickings);
+        mouse_button_is_down = true;
+        draw_on_canvas(); // This call updates the screen.
+      }
+
+      function on_mouse_up(event) {
+        if (event.offsetX && event.offsetY) {
+          // Safari, IE, Chrome, and Opera have the offsetX
+          // and offsetY attributes.
+
+          clicked_point_x = event.offsetX;
+          clicked_point_y = event.offsetY;
+        } else if (event.clientX && event.clientY) {
+          // Safari and Firefox have clientX and clientY attributes.
+          // It seems that this "else if" block is needed only because
+          // of Firefox.
+
+          var canvas = event.target;
+
+          clicked_point_x = event.clientX - canvas.offsetLeft;
+          clicked_point_y = event.clientY - canvas.offsetTop;
+        }
+
+        mouse_button_is_down = false;
+
+        draw_on_canvas();
+      }
+
+      function draw_on_canvas() {
+        var canvas = document.getElementById('canvas_for_clickings');
+        var context = canvas.getContext('2d');
+
+        // We'll fill the entire canvas with light color.
+
+        context.fillStyle = 'LightBlue';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+
+        var canvas_center_point_x = canvas.width / 2;
+        var canvas_center_point_y = canvas.height / 2;
+
+        context.fillStyle = 'Blue';
+
+        // The following loop draws all the clicked points each
+        // time this function is called.
+
+        let center_text = context.measureText(text_to_show).width;
+        let center_point_x = canvas_center_point_x - center_text / 2;
+
+        if (mouse_button_is_down) {
+          context.fillStyle = 'brown';
+        } else {
+          context.fillStyle = 'cornflowerblue';
+        }
+        if (clicked_point_x != -1) {
+          // if where mouse clicked is greater than 600 / 2 (300)
+          if (clicked_point_x > canvas.width / 2) {
+            // if where mouse clicked is less than 500 7 (500)
+            if (clicked_point_y < canvas.height / 2) {
+              // then you have clicked top right side of box
+              text_to_show = 'North East';
+              // fill rectangle (300, 0, 300, 250)
+              context.fillRect(
+                canvas_center_point_x,
+                0,
+                canvas.width / 2,
+                canvas.height / 2
+              );
+            } // else if clicked below the half way point of canvas height
+            else {
+              // then you clicked in bottom right side
+              text_to_show = 'South East';
+              // fill rectangle (300, 250, 600, 500 )
+              context.fillRect(
+                canvas_center_point_x,
+                canvas_center_point_y,
+                canvas.width,
+                canvas.height
+              );
+            }
+          } else {
+            // whiere clicked is less than 250 and less than 300
+            if (clicked_point_y < canvas.height / 2) {
+              text_to_show = 'North West';
+              // fill rectangle (0, 0, 300, 250)
+              context.fillRect(0, 0, canvas.width / 2, canvas.height / 2);
+            } else {
+              // else if clicked and y is greater than 250 and x is less than 300
+              text_to_show = 'South West';
+              // fill rect (0, 250, 300, 500)
+              context.fillRect(
+                0,
+                canvas_center_point_y,
+                canvas.width / 2,
+                canvas.height
+              );
+            }
+          }
+        }
+        context.font = large_font;
+        var text_width = context.measureText(text_to_show).width;
+        console.log(text_width);
+        var text_position_x = canvas_center_point_x - text_width / 2;
+        var text_position_y = canvas_center_point_y;
+        var central_rectangle_x = text_position_x - 16;
+        var central_rectangle_y = text_position_y - 32;
+        var central_rectangle_width = text_width + 2 * 16;
+        var central_rectangle_height = 48;
+
+        context.fillStyle = 'CornflowerBlue';
+
+        context.fillRect(
+          central_rectangle_x,
+          central_rectangle_y,
+          central_rectangle_width,
+          central_rectangle_height
+        );
+
+        context.strokeRect(
+          central_rectangle_x,
+          central_rectangle_y,
+          central_rectangle_width,
+          central_rectangle_height
+        );
+
+        context.fillStyle = 'black';
+
+        context.fillText(text_to_show, text_position_x, text_position_y);
+      }
+    </script>
+
+    <style type="text/css">
+      #centered {
+        width: 600px;
+        height: 500px;
+        margin: 30px auto; /* top and bottom margins are 30p;
+                               right and left margins are automatic */
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+
+  <body onload="draw_on_canvas()">
+    <div id="centered">
+      <!-- We'll specify a canvas so that method on_mouse_down() will be
+           called when onmousedown event takes place within the canvas area -->
+
+      <canvas
+        id="canvas_for_clickings"
+        width="600"
+        height="500"
+        onmousedown="on_mouse_down( event )"
+        onmouseup="on_mouse_up( event )"
+      >
+      </canvas>
+    </div>
+  </body>
+</html>
