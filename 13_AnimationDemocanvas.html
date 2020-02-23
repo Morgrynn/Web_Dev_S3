@@ -20,6 +20,7 @@
     There are notes at the end of this file.
 
 -->
+    <script src="Ball.js"></script>
 
     <script type="text/javascript">
       var ball_center_point_x = 300;
@@ -29,54 +30,95 @@
 
       var ball_must_be_shown = true;
 
+      var ball_on_screen = new Ball(300, 240, 'green');
+      ball_on_screen.set_diameter(100);
+      ball_on_screen.activate_ball();
+
+      var going_clockwise = true;
+      var current_direction = 'DOWN';
+
+      function on_key_press(event) {
+        going_clockwise = !going_clockwise;
+        if (current_direction == 'DOWN') {
+          current_direction = 'UP';
+        } else if (current_direction == 'LEFT') {
+          current_direction = 'RIGHT';
+        } else if (current_direction == 'UP') {
+          current_direction = 'DOWN';
+        } else if (current_direction == 'RIGHT') {
+          current_direction = 'LEFT';
+        }
+      }
+
       function draw_on_canvas() {
         var canvas = document.getElementById('animation_demo_canvas');
         var context = canvas.getContext('2d');
 
-        // We'll fill the entire canvas with light color, which overdraws
-        // the previous drawings.
-
         context.fillStyle = 'rgb( 255, 255, 210 )'; // light yellow
         context.fillRect(0, 0, canvas.width, canvas.height);
 
-        var ball_movement_down = 2;
-
-        ball_center_point_y += ball_movement_down;
-        if (ball_center_point_y + 50 > canvas.height) {
-          ball_center_point_y -= ball_movement_down;
-        }
-
         if (ball_must_be_shown == true) {
-          context.fillStyle = current_ball_color;
-
-          context.beginPath();
-          context.arc(
-            ball_center_point_x,
-            ball_center_point_y,
-            50,
-            0,
-            2 * Math.PI,
-            true
-          );
-          context.closePath();
-          context.stroke();
-          context.fill();
+          ball_on_screen.draw(context);
 
           ball_must_be_shown = false;
         } else {
           ball_must_be_shown = true;
         }
 
-        //  With the following method call we specify that this
-        //  method "draw_on_canvas()" will be automatically called
-        //  again after 1000 milliseconds, i.e., after one second.
+        if (going_clockwise == true) {
+          if (current_direction == 'DOWN') {
+            ball_on_screen.move_down();
+            if (
+              ball_on_screen.get_ball_center_point_y() >=
+              canvas.height - 50
+            ) {
+              current_direction = 'LEFT';
+            }
+          } else if (current_direction == 'LEFT') {
+            ball_on_screen.move_left();
+            if (ball_on_screen.get_ball_center_point_x() <= 50) {
+              current_direction = 'UP';
+            }
+          } else if (current_direction == 'UP') {
+            ball_on_screen.move_up();
+            if (ball_on_screen.get_ball_center_point_y() <= 50) {
+              current_direction = 'RIGHT';
+            }
+          } else if (current_direction == 'RIGHT') {
+            ball_on_screen.move_right();
+            if (ball_on_screen.get_ball_center_point_x() >= canvas.width - 50) {
+              current_direction = 'DOWN';
+            }
+          }
+        } else {
+          // We are going counter-clockwise
+          if (current_direction == 'DOWN') {
+            ball_on_screen.move_down();
+            if (
+              ball_on_screen.get_ball_center_point_y() >=
+              canvas.height - 50
+            ) {
+              current_direction = 'RIGHT';
+            }
+          } else if (current_direction == 'RIGHT') {
+            ball_on_screen.move_right();
+            if (ball_on_screen.get_ball_center_point_x() >= canvas.width - 50) {
+              current_direction = 'UP';
+            }
+          } else if (current_direction == 'UP') {
+            ball_on_screen.move_up();
+            if (ball_on_screen.get_ball_center_point_y() <= 50) {
+              current_direction = 'LEFT';
+            }
+          } else if (current_direction == 'LEFT') {
+            ball_on_screen.move_left();
+            if (ball_on_screen.get_ball_center_point_X() <= 50) {
+              current_direction = 'DOWN';
+            }
+          }
+        }
 
-        //  This has the effect that "draw_on_canvas()" is executed
-        //  repeatedly once in every second. As the ball is
-        //  not drawn during every execution, it seems to blink
-        //  on the screen.
-
-        setTimeout('draw_on_canvas()', 1000);
+        setTimeout('draw_on_canvas()', 100);
       }
     </script>
 
